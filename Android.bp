@@ -105,6 +105,7 @@ cc_library_shared {
 
     cflags: [
         "-Werror",
+        "-Wno-unused-parameter",
         "-Winvalid-pch",
         "-DSYSCONFDIR=\"/vendor/etc\"",
         "-DLOG_TAG=\"libva\"",
@@ -143,6 +144,7 @@ cc_library_shared {
 
     cflags: [
         "-Werror",
+        "-Wno-unused-parameter",
         "-Winvalid-pch",
         "-DLOG_TAG=\"libva-android\"",
     ],
