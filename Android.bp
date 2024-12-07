@@ -113,10 +113,10 @@ cc_library_shared {
 
     arch: {
         x86: {
-            cflags: ["-DVA_DRIVERS_PATH=\"/vendor/lib\""],
+            cflags: ["-DVA_DRIVERS_PATH=\"/vendor/lib/dri\""],
         },
         x86_64: {
-            cflags: ["-DVA_DRIVERS_PATH=\"/vendor/lib64\""],
+            cflags: ["-DVA_DRIVERS_PATH=\"/vendor/lib64/dri\""],
         },
     },
 
