@@ -44,6 +44,7 @@
 #else
 #include <dlfcn.h>
 #include <unistd.h>
+#include <linux/limits.h>
 #define DRIVER_EXTENSION    "_drv_video.so"
 #define DRIVER_PATH_STRING  "%s/%s%s"
 #define ENV_VAR_SEPARATOR ":"
@@ -358,11 +359,15 @@ static char *va_getDriverPath(const char *driver_dir, const char *driver_name)
     int n = snprintf(0, 0, DRIVER_PATH_STRING, driver_dir, driver_name, DRIVER_EXTENSION);
     if (n < 0)
         return NULL;
-    char *driver_path = (char *) malloc(n + 1);
+    char *driver_path = (char *) malloc(PATH_MAX);
     if (!driver_path)
         return NULL;
-    n = snprintf(driver_path, n + 1, DRIVER_PATH_STRING,
-                 driver_dir, driver_name, DRIVER_EXTENSION);
+    if (strcmp(driver_name, "iHD") && strcmp(driver_name, "i965")) {
+        n = snprintf(driver_path, PATH_MAX, "%s/libgallium_dri.so", driver_dir);
+    } else {
+        n = snprintf(driver_path, PATH_MAX, DRIVER_PATH_STRING,
+                     driver_dir, driver_name, DRIVER_EXTENSION);
+    }
     if (n < 0) {
         free(driver_path);
         return NULL;
