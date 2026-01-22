@@ -134,6 +134,7 @@ cc_library_shared {
     name: "libva-android",
 
     shared_libs: [
+        "libcutils",
         "libva",
         "libdrm",
         "liblog",

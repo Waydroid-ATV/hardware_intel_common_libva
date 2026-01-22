@@ -39,6 +39,7 @@
 #include <fcntl.h>
 #include <dlfcn.h>
 #include <errno.h>
+#include <cutils/properties.h>
 
 
 #define CHECK_SYMBOL(func) { if (!func) printf("func %s not found\n", #func); return VA_STATUS_ERROR_UNKNOWN; }
@@ -66,10 +67,13 @@ static VAStatus va_DisplayContextConnect(
     VADisplayContextP pDisplayContext
 )
 {
+    char drm_device[PROPERTY_VALUE_MAX];
     VADriverContextP const ctx = pDisplayContext->pDriverContext;
     struct drm_state * const drm_state = (struct drm_state *)ctx->drm_state;
 
-    drm_state->fd = open(DEVICE_NAME, O_RDWR | O_CLOEXEC);
+    property_get("gralloc.gbm.device", drm_device, DEVICE_NAME);
+
+    drm_state->fd = open(drm_device, O_RDWR | O_CLOEXEC);
     if (drm_state->fd < 0) {
         fprintf(stderr, "Cannot open DRM device '%s': %d, %s\n",
                 DEVICE_NAME, errno, strerror(errno));
