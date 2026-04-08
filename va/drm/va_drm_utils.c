@@ -32,6 +32,10 @@
 #include "va_drm_utils.h"
 #include "va_drmcommon.h"
 
+#ifdef ANDROID
+#include <cutils/properties.h>
+#endif
+
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 static char *
@@ -60,7 +64,7 @@ VA_DRM_GetDriverNames(VADriverContextP ctx, char **drivers, unsigned *num_driver
         const char * const va_driver[MAX_NAMES];
     } map[] = {
         { "xe",         { "iHD"              } },
-        { "i915",       { "iHD", "i965", "crocus"      } }, // Intel Media and OTC GenX
+        { "i915",       { "iHD", "i965"      } }, // Intel Media and OTC GenX
         { "pvrsrvkm",   { "pvr"              } }, // Intel UMG PVR
         { "radeon",     { "r600", "radeonsi" } }, // Mesa Gallium
         { "amdgpu",     { "radeonsi"         } }, // Mesa Gallium
@@ -70,6 +74,7 @@ VA_DRM_GetDriverNames(VADriverContextP ctx, char **drivers, unsigned *num_driver
     };
 
     const struct drm_state * const drm_state = ctx->drm_state;
+    const bool use_nouveau = property_get_bool("ro.waydroid.nouveau_vaapi", false);
     char *drm_driver;
     unsigned count = 0;
 
@@ -79,6 +84,11 @@ VA_DRM_GetDriverNames(VADriverContextP ctx, char **drivers, unsigned *num_driver
     drm_driver = va_DRM_GetDrmDriverName(drm_state->fd);
     if (!drm_driver)
         return VA_STATUS_ERROR_UNKNOWN;
+
+    /* Block nouveau driver by default */
+    if (!strncmp(drm_driver, "nouveau", 7) && !use_nouveau) {
+        return VA_STATUS_ERROR_UNKNOWN;
+    }
 
     /* Map vgem to WSL2 for Windows subsystem for linux */
     struct utsname sysinfo = {};
